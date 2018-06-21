@@ -7,6 +7,9 @@ import Display from './Display';
 import PageWrapper from './styles/PageWrapper';
 import CalcWrapper from './styles/CalcWrapper';
 
+// import utils
+import calcSolution from './utils/calcSolution';
+
 injectGlobal`
   html, body, #root {
     margin: 0;
@@ -17,7 +20,7 @@ injectGlobal`
 class App extends Component {
   // as long as solution is empty, display will show input
   // once there is a solution, it switches to show that
-  // if a solution is active and new keys are entered 
+  // if a solution is active and new keys are entered
   // it erases the solution and begins again
 
   state = {
@@ -26,10 +29,9 @@ class App extends Component {
   };
 
   inputkey = key => {
-    this.state.solution.length === 0 ?
-      this.setState({ input: this.state.input.concat(key) })
-      :
-      this.setState({ input: key.toString(), solution: '' })
+    this.state.solution.length === 0
+      ? this.setState({ input: this.state.input.concat(key) })
+      : this.setState({ input: key.toString(), solution: '' });
   };
 
   clearInput = () => {
@@ -38,7 +40,7 @@ class App extends Component {
 
   equals = () => {
     this.setState({
-      solution: eval(this.state.input).toString()
+      solution: calcSolution(this.state.input).toString()
     });
   };
 

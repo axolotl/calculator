@@ -10,6 +10,7 @@ export const NumberKey = styled.button`
   justify-content: center;
   align-items: center;
   background-color: #f9f9f9;
+  font-size: 16px;
 `;
 
 export const EqualsKey = NumberKey.extend`

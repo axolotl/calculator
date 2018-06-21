@@ -6,9 +6,11 @@ const ScreenWrapper = styled.div`
   margin: 5px;
   padding: 0 15px;
   height: 40px;
+  width: 238px;
   align-items: center;
   justify-content: flex-end;
   overflow: hidden;
+  font-size: 24px;
 `;
 
 export default ScreenWrapper;

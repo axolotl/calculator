@@ -1,14 +1,19 @@
 import React, { Component } from 'react';
 import { injectGlobal } from 'styled-components';
 
-// import styles and components
+// import components
 import Calculator from './Calculator';
 import Display from './Display';
+import Warn from './Warn';
+
+// import styles
 import PageWrapper from './styles/PageWrapper';
 import CalcWrapper from './styles/CalcWrapper';
 
 // import utils
 import calcSolution from './utils/calcSolution';
+import isOperator from './utils/isOperator';
+import multipleLeadingZeros from './utils/multipleLeadingZeros';
 
 injectGlobal`
   html, body, #root {
@@ -25,13 +30,49 @@ class App extends Component {
 
   state = {
     input: '',
-    solution: ''
+    solution: '',
+    warnings: []
   };
 
   inputkey = key => {
-    this.state.solution.length === 0
-      ? this.setState({ input: this.state.input.concat(key) })
-      : this.setState({ input: key.toString(), solution: '' });
+    const { input, solution, warnings } = this.state;
+
+    // if no solution, simply add key to input
+    if (solution.length === 0) {
+      // if last key was operator, replace with new key
+      if (isOperator(input[input.length - 1]) && isOperator(key)) {
+        this.setState({ input: input.slice(0, input.length - 1).concat(key) });
+      } else if (input[input.length - 1] === '.' && key === '.') {
+        this.setState({
+          warnings: warnings.concat(
+            'Cannot add two decimal points to the same number'
+          )
+        });
+        setTimeout(this.clearWarning, 2000);
+      } else if (
+        key === 0 &&
+        input.length > 0 &&
+        input[input.length - 1] === '0' &&
+        multipleLeadingZeros(input)
+      ) {
+        this.setState({
+          warnings: warnings.concat('Cannot use mutliple leading zeros')
+        });
+        setTimeout(this.clearWarning, 2000);
+      } else {
+        this.setState({ input: input.concat(key) });
+      }
+    }
+
+    // if there is a solution displayed and operator is pressed, pipe solution into first value of input
+    else if (isOperator(key)) {
+      this.setState({ input: solution.concat(key), solution: '' });
+    }
+
+    // if there is a solution displayed and key is pressed, add key input and wipe solution
+    else {
+      this.setState({ input: key.toString(), solution: '' });
+    }
   };
 
   clearInput = () => {
@@ -39,17 +80,29 @@ class App extends Component {
   };
 
   equals = () => {
+    try {
+      const solution = calcSolution(this.state.input).toString();
+      this.setState({ solution })
+    } catch (error) {
+      this.throwWarning('Impossible to evaluate input. Press CE to try again.')
+    }
+  };
+
+  throwWarning = warning => {
     this.setState({
-      solution: calcSolution(this.state.input).toString()
+      warnings: this.state.warnings.concat(warning)
     });
+    setTimeout(this.clearWarning, 2000);
+  };
+
+  clearWarning = () => {
+    this.setState({ warnings: this.state.warnings.slice(1) });
   };
 
   render() {
-    const { input, solution } = this.state;
+    const { input, solution, warnings } = this.state;
     const { inputkey, clearInput, equals } = this;
     const display = solution.length === 0 ? input : solution;
-
-    console.log(this.state);
 
     return (
       <PageWrapper>
@@ -60,6 +113,9 @@ class App extends Component {
             clearInput={clearInput}
             equals={equals}
           />
+
+          {warnings.length > 0 &&
+            warnings.map((warning, i) => <Warn key={i} warning={warning} />)}
         </CalcWrapper>
       </PageWrapper>
     );

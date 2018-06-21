@@ -1,23 +1,16 @@
-import React, { Component } from 'react';
+import React from 'react';
 
 // import styles
 import CalcWrapper from './styles/CalcWrapper';
 import Row from './styles/Row';
 import Key from './Key';
 
-const test = {
-  name: '+',
-  method: () => {
-    console.log('hello test')
-  }
-}
-
 const keys = [
   ['(', ')', '%', 'CE'],
   [7, 8, 9, '÷'],
   [4, 5, 6, 'x'],
   [1, 2, 3, '-'],
-  [0, '.', '=', '+'],
+  [0, '.', '=', '+']
 ];
 
 const Calculator = ({ inputkey, clearInput, equals }) => (
@@ -29,13 +22,13 @@ const Calculator = ({ inputkey, clearInput, equals }) => (
             const key = `row${i}col${j}`;
             let onClick;
             switch (col) {
-              case 'CE': 
+              case 'CE':
                 onClick = () => clearInput();
                 break;
               case '=':
                 onClick = () => equals();
                 break;
-              default: 
+              default:
                 onClick = () => inputkey(col);
             }
 

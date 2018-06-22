@@ -35,7 +35,7 @@ class App extends Component {
   };
 
   inputkey = key => {
-    const { input, solution, warnings } = this.state;
+    const { input, solution } = this.state;
 
     // if no solution, simply add key to input
     if (solution.length === 0) {
@@ -43,22 +43,14 @@ class App extends Component {
       if (isOperator(input[input.length - 1]) && isOperator(key)) {
         this.setState({ input: input.slice(0, input.length - 1).concat(key) });
       } else if (input[input.length - 1] === '.' && key === '.') {
-        this.setState({
-          warnings: warnings.concat(
-            'Cannot add two decimal points to the same number'
-          )
-        });
-        setTimeout(this.clearWarning, 2000);
+        this.throwWarning('Cannot add two decimal points to the same number');
       } else if (
         key === 0 &&
         input.length > 0 &&
         input[input.length - 1] === '0' &&
         multipleLeadingZeros(input)
       ) {
-        this.setState({
-          warnings: warnings.concat('Cannot use mutliple leading zeros')
-        });
-        setTimeout(this.clearWarning, 2000);
+        this.throwWarning('Cannot use mutliple leading zeros');
       } else {
         this.setState({ input: input.concat(key) });
       }
@@ -82,9 +74,9 @@ class App extends Component {
   equals = () => {
     try {
       const solution = calcSolution(this.state.input).toString();
-      this.setState({ solution })
+      this.setState({ solution });
     } catch (error) {
-      this.throwWarning('Impossible to evaluate input. Press CE to try again.')
+      this.throwWarning('Impossible to evaluate input. Press CE to try again.');
     }
   };
 
@@ -92,11 +84,10 @@ class App extends Component {
     this.setState({
       warnings: this.state.warnings.concat(warning)
     });
-    setTimeout(this.clearWarning, 2000);
-  };
-
-  clearWarning = () => {
-    this.setState({ warnings: this.state.warnings.slice(1) });
+    setTimeout(
+      () => this.setState({ warnings: this.state.warnings.slice(1) }),
+      2000
+    );
   };
 
   render() {
